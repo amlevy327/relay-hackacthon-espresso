@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,14 +12,12 @@ import (
 	"time"
 )
 
-// Config represents the configuration for the application.
 type Config struct {
 	HotShotURL      string        `json:"hotshot_url"`
 	Namespace       uint64        `json:"namespace"`
 	PollingInterval time.Duration `json:"polling_interval"`
 }
 
-// loadConfig reads the JSON configuration from config/config.json and decodes it into a Config struct.
 func loadConfig() Config {
 	data, err := os.ReadFile("config/config.json")
 	if err != nil {
@@ -41,41 +40,64 @@ func main() {
 	ticker := time.NewTicker(cfg.PollingInterval * time.Second / 2)
 	defer ticker.Stop()
 
+	var temp_height uint64
+
 	for range ticker.C {
-		resp, err := http.Get(cfg.HotShotURL + "/status/block-height")
+		blockHeight, err := fetchBlockHeight(cfg)
 		if err != nil {
-			fmt.Println("Error querying block height:", err)
+			fmt.Println("Error fetching block height:", err)
 			continue
 		}
 
-		body, err := io.ReadAll(resp.Body)
-		resp.Body.Close()
-		if err != nil {
-			fmt.Println("Error reading block height response:", err)
-			continue
+		if blockHeight != temp_height {
+			temp_height = blockHeight
+			fmt.Println("Latest Block Height:", blockHeight)
 		}
 
-		blockHeight, err := strconv.ParseUint(strings.TrimSpace(string(body)), 10, 64)
+		availBody, err := fetchTransactions(cfg, blockHeight)
+
 		if err != nil {
-			fmt.Println("Error parsing block height:", err)
+			fmt.Println("Error fetching availability:", err)
 			continue
 		}
-		fmt.Println("Latest Block Height:", blockHeight)
-
-		availURL := fmt.Sprintf("%s/availability/block/%d/namespace/%d", cfg.HotShotURL, blockHeight, cfg.Namespace)
-
-		availResp, err := http.Get(availURL)
-		if err != nil {
-			fmt.Println("Error querying availability endpoint:", err)
+		if strings.Contains(string(availBody), "FetchBlock") {
 			continue
 		}
-
-		availBody, err := io.ReadAll(availResp.Body)
-		availResp.Body.Close()
-		if err != nil {
-			fmt.Println("Error reading availability response:", err)
-			continue
+		var prettyJSON bytes.Buffer
+		if err := json.Indent(&prettyJSON, availBody, "", "  "); err == nil {
+			fmt.Printf("Hotshot Namespace Transactions:\n%s\n", prettyJSON.String())
+		} else {
+			fmt.Printf("Hotshot Namespace Transactions: %s\n", availBody)
 		}
-		fmt.Println("Hotshot Namespace Transactions:", string(availBody))
 	}
+}
+
+func fetchBlockHeight(cfg Config) (uint64, error) {
+	resp, err := http.Get(cfg.HotShotURL + "/status/block-height")
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return 0, err
+	}
+
+	blockHeight, err := strconv.ParseUint(strings.TrimSpace(string(body)), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return blockHeight, nil
+}
+
+func fetchTransactions(cfg Config, blockHeight uint64) ([]byte, error) {
+	availURL := fmt.Sprintf("%s/availability/block/%d/namespace/%d", cfg.HotShotURL, blockHeight, cfg.Namespace)
+	resp, err := http.Get(availURL)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return io.ReadAll(resp.Body)
 }
