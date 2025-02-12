@@ -45,8 +45,8 @@ Below is an example configuration file:
 
 ```json
 {
-  "hotshot_url": "https://query.main.net.espresso.network/v0",
-  "namespace": 1380012617,
+  "hotshot_url": "https://query.decaf.testnet.espresso.network/v0",
+  "namespace": 20250115,
   "polling_interval": 10
 }
 ```
