@@ -37,7 +37,6 @@ This is a simple Go project that fetches and prints namespace transactions from 
 
 The application uses a configuration file located at `config/config.json`. This file allows you to customize the following parameters:
 
-- **Namespace:** Change the namespace identifier.
 - **Query Service Endpoint:** Set your Hotshot query service URLs.
 - **Namespace (Chain ID):** Change the namespace identifier. **Note:** In this project, the namespace is the same as the chain id used by the network. This means that when you configure the namespace, you are effectively specifying the chain identifier.
 - **Polling Interval:** Adjust the time interval for how frequently the project polls the API.
@@ -52,21 +51,45 @@ Below is an example configuration file:
 }
 ```
 
-## Example Logs
-
-Example logs are available in the `example-logs` directory. A typical log entry will look like:
-
-```json
-Hotshot Namespace Transactions:
-{
-  "proof": null,
-  "transactions": []
-}
-```
 
 ## Extending the Project
 
 You can easily extend this project to interact with additional endpoints (such as block headers or explorer transactions) by following the existing structure. Simply update the configuration and add new functions to handle the additional API calls.
+
+## Additional Resources
+
+Below are some common API endpoints along with example responses used in this project:
+
+- **/status/block-height**  
+  *Example Response:*  
+  ```json
+  {"blockHeight": 12345}
+  ```
+
+- **/availability/block/"blockHeight"/namespace/"chainId"**  
+  *Example Response:*  
+  ```json
+  {
+    "proof": null,
+    "transactions": []
+  }
+  ```
+
+**Example Query Responses:**  
+For additional reference, please see [`example-logs/transactions-data.json`](example-logs/transactions-data.json), which contains valid API responses to help you know what to expect.
+
+For a complete overview of all supported endpoints and details on each module, please refer to the [Espresso API Guide](https://docs.espressosys.com/network/api-reference/sequencer-api).
+
+## Espresso API Modules
+
+The Espresso API is divided into several modules:
+ - [Status API](https://docs.espressosys.com/network/api-reference/sequencer-api/status-api) – Provides node-specific state and consensus metrics.
+ - [Catchup API](https://docs.espressosys.com/network/api-reference/sequencer-api/catchup-api) – Serves recent consensus state to allow peers to catch up with the network.
+ - [Availability API](https://docs.espressosys.com/network/api-reference/sequencer-api/availability-api) – Serves data recorded by the [Tiramisu DA](https://docs.espressosys.com/network/learn/the-espresso-network/properties-of-hotshot/espresso-data-availability-layer) layer (EspressoDA), such as committed blocks. 
+ - [Node API](https://docs.espressosys.com/network/api-reference/sequencer-api/node-api) – Complements the availability API by serving eventually consistent data that is not (yet) necessarily agreed upon by all nodes.
+ - [State API](https://docs.espressosys.com/network/api-reference/sequencer-api/state-api) – Serves consensus state derived from finalized blocks.
+ - [Events API](https://docs.espressosys.com/network/api-reference/sequencer-api/events-api) – Streams events from HotShot.
+ - [Submit API](https://docs.espressosys.com/network/api-reference/sequencer-api/submit-api) – Allows users to submit transactions to the public mempool.
 
 ## License
 
