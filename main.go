@@ -14,7 +14,7 @@ import (
 
 type Config struct {
 	HotShotURL      string        `json:"hotshot_url"`
-	Namespace       uint64        `json:"namespace"`
+	ChainID         uint64        `json:"chain_id"`
 	PollingInterval time.Duration `json:"polling_interval"`
 }
 
@@ -92,7 +92,7 @@ func fetchBlockHeight(cfg Config) (uint64, error) {
 }
 
 func fetchTransactions(cfg Config, blockHeight uint64) ([]byte, error) {
-	availURL := fmt.Sprintf("%s/availability/block/%d/namespace/%d", cfg.HotShotURL, blockHeight, cfg.Namespace)
+	availURL := fmt.Sprintf("%s/availability/block/%d/namespace/%d", cfg.HotShotURL, blockHeight, cfg.ChainID)
 	resp, err := http.Get(availURL)
 	if err != nil {
 		return nil, err
