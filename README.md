@@ -39,6 +39,7 @@ The application uses a configuration file located at `config/config.json`. This 
 
 - **Namespace:** Change the namespace identifier.
 - **Query Service Endpoint:** Set your Hotshot query service URLs.
+- **Namespace (Chain ID):** Change the namespace identifier. **Note:** In this project, the namespace is the same as the chain id used by the network. This means that when you configure the namespace, you are effectively specifying the chain identifier.
 - **Polling Interval:** Adjust the time interval for how frequently the project polls the API.
 
 Below is an example configuration file:
