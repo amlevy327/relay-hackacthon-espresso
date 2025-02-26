@@ -1,21 +1,23 @@
 package main
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
+	"log"
+	"math/big"
 	"os"
-	"strconv"
-	"strings"
 	"time"
+
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 type Config struct {
 	HotShotURL      string        `json:"hotshot_url"`
 	ChainID         uint64        `json:"chain_id"`
 	PollingInterval time.Duration `json:"polling_interval"`
+	CaffNodeURL     string        `json:"caff_node_url"`
 }
 
 func loadConfig() Config {
@@ -40,64 +42,62 @@ func main() {
 	ticker := time.NewTicker(cfg.PollingInterval * time.Second / 2)
 	defer ticker.Stop()
 
-	var temp_height uint64
+	client, err := ethclient.Dial(cfg.CaffNodeURL)
+	if err != nil {
+		log.Fatalf("Failed to connect to the Ethereum client: %v", err)
+	}
+
+	var lastBlockNumber uint64
 
 	for range ticker.C {
-		blockHeight, err := fetchBlockHeight(cfg)
-		if err != nil {
-			fmt.Println("Error fetching block height:", err)
-			continue
-		}
-
-		if blockHeight != temp_height {
-			temp_height = blockHeight
-			fmt.Println("Latest Block Height:", blockHeight)
-		}
-
-		availBody, err := fetchTransactions(cfg, blockHeight)
-
-		if err != nil {
-			fmt.Println("Error fetching availability:", err)
-			continue
-		}
-		if strings.Contains(string(availBody), "FetchBlock") {
-			continue
-		}
-		var prettyJSON bytes.Buffer
-		if err := json.Indent(&prettyJSON, availBody, "", "  "); err == nil {
-			fmt.Printf("Hotshot Namespace Transactions:\n%s\n", prettyJSON.String())
-		} else {
-			fmt.Printf("Hotshot Namespace Transactions: %s\n", availBody)
-		}
+		transactions(cfg, client, &lastBlockNumber)
 	}
 }
 
-func fetchBlockHeight(cfg Config) (uint64, error) {
-	resp, err := http.Get(cfg.HotShotURL + "/status/block-height")
+func transactions(cfg Config, client *ethclient.Client, lastBlockNumber *uint64) {
+	blockNumber, err := client.BlockNumber(context.Background())
 	if err != nil {
-		return 0, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return 0, err
+		log.Printf("Failed to get the latest block number: %v", err)
+		return
 	}
 
-	blockHeight, err := strconv.ParseUint(strings.TrimSpace(string(body)), 10, 64)
-	if err != nil {
-		return 0, err
+	if blockNumber == *lastBlockNumber {
+		return // Skip if we've already seen this block
 	}
-	return blockHeight, nil
+
+	block, err := client.BlockByNumber(context.Background(), big.NewInt(int64(blockNumber)))
+	if err != nil {
+		log.Printf("Failed to get block: %v", err)
+		return
+	}
+
+	fmt.Printf("Latest Block Number: %d\n", blockNumber)
+	fmt.Println("Transactions in the Latest Block:")
+
+	for i, tx := range block.Transactions() {
+		if i == 0 {
+			continue
+		}
+		printTransactionDetails(tx)
+	}
+
+	*lastBlockNumber = blockNumber
 }
 
-func fetchTransactions(cfg Config, blockHeight uint64) ([]byte, error) {
-	availURL := fmt.Sprintf("%s/availability/block/%d/namespace/%d", cfg.HotShotURL, blockHeight, cfg.ChainID)
-	resp, err := http.Get(availURL)
+func printTransactionDetails(tx *types.Transaction) {
+	msg, err := types.Sender(types.LatestSignerForChainID(tx.ChainId()), tx)
 	if err != nil {
-		return nil, err
+		log.Printf("Failed to get sender for transaction %s: %v", tx.Hash().Hex(), err)
+		return
 	}
-	defer resp.Body.Close()
 
-	return io.ReadAll(resp.Body)
+	fmt.Printf("Transaction Hash: %s\n", tx.Hash().Hex())
+	fmt.Printf("  Value: %d\n", tx.Value().Int64())
+	fmt.Printf("  From: %s\n", msg.Hex())
+	if tx.To() != nil {
+		fmt.Printf("  To: %s\n", tx.To().Hex())
+	} else {
+		fmt.Println("  To: Contract Creation")
+	}
+	fmt.Println("---------------------------")
 }
