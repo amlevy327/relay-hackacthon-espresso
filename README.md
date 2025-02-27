@@ -21,7 +21,7 @@ This is a Go application that monitors an your rollup for specific transactions.
 1. **Clone the Repository**
 
    ```bash
-   git clone <repository-url> --recursive
+   git clone https://github.com/EspressoSystems/hackathon-example --recursive
    cd hackathon-example
    ```
 
