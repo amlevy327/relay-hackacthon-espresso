@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"hackathon-example/config"
 	"log"
 	"math/big"
@@ -28,7 +27,7 @@ func searchLatestTransactions(cfg config.Config, client *ethclient.Client, lastB
 		return
 	}
 
-	fmt.Printf("Searching for transaction at block number %d\n", blockNumber)
+	log.Printf("Searching for transaction at latest block number: %d\n", blockNumber)
 	for i, tx := range block.Transactions() {
 		if i == 0 {
 			continue
@@ -47,14 +46,14 @@ func inspectTransaction(tx *types.Transaction, cfg config.Config) {
 	}
 
 	if tx.Value().Int64() >= int64(cfg.Value) && msg.Hex() == cfg.From {
-		fmt.Printf("Transaction Hash: %s\n", tx.Hash().Hex())
-		fmt.Printf("  Value: %d\n", tx.Value().Int64())
-		fmt.Printf("  From: %s\n", msg.Hex())
+		log.Printf("Transaction Hash: %s\n", tx.Hash().Hex())
+		log.Printf("  Value: %d\n", tx.Value().Int64())
+		log.Printf("  From: %s\n", msg.Hex())
 		if tx.To() != nil {
-			fmt.Printf("  To: %s\n", tx.To().Hex())
+			log.Printf("  To: %s\n", tx.To().Hex())
 		} else {
-			fmt.Println("  To: Contract Creation")
+			log.Printf("  To: Contract Creation")
 		}
-		fmt.Println("---------------------------")
+		log.Println("---------------------------------------------------------------------------------")
 	}
 }
