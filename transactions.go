@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"hackathon-example/config"
 	"log"
 	"math/big"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func searchLatestTransactions(cfg Config, client *ethclient.Client, lastBlockNumber *uint64) {
+func searchLatestTransactions(cfg config.Config, client *ethclient.Client, lastBlockNumber *uint64) {
 	blockNumber, err := client.BlockNumber(context.Background())
 	if err != nil {
 		log.Printf("Failed to get the latest block number: %v", err)
@@ -38,7 +39,7 @@ func searchLatestTransactions(cfg Config, client *ethclient.Client, lastBlockNum
 	*lastBlockNumber = blockNumber
 }
 
-func inspectTransaction(tx *types.Transaction, cfg Config) {
+func inspectTransaction(tx *types.Transaction, cfg config.Config) {
 	msg, err := types.Sender(types.LatestSignerForChainID(tx.ChainId()), tx)
 	if err != nil {
 		log.Printf("Failed to get sender for transaction %s: %v", tx.Hash().Hex(), err)
