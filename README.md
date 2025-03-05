@@ -36,7 +36,6 @@ This is a Go application that monitors an your rollup for specific transactions.
    ```bash
    go mod tidy
    ```
-
 3. **Configure the Application**
 
    Edit the configuration file at `config/config.json` to set your Caff node URL, polling interval, and transaction filtering criteria.
