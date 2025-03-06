@@ -29,6 +29,7 @@ func searchLatestTransactions(cfg config.Config, client *ethclient.Client, lastB
 
 	log.Printf("Searching for transaction at last processed block number: %d\n", blockNumber)
 	for i, tx := range block.Transactions() {
+		// Transaction indexes start at 1. Tx 0 is an empty transaction.
 		if i == 0 {
 			continue
 		}

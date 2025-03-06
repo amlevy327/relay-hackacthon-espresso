@@ -21,7 +21,7 @@ This is a Go application that monitors an your rollup for specific transactions.
 1. **Clone the Repository**
 
    ```bash
-   git clone <repository-url> --recursive
+   git clone https://github.com/EspressoSystems/hackathon-example --recursive
    cd hackathon-example
    ```
 
@@ -31,7 +31,12 @@ This is a Go application that monitors an your rollup for specific transactions.
    git submodule update --init --recursive
    ```
 
-2. **Configure the Application**
+2. **Install Dependencies**
+
+   ```bash
+   go mod tidy
+   ```
+3. **Configure the Application**
 
    Edit the configuration file at `config/config.json` to set your Caff node URL, polling interval, and transaction filtering criteria.
 
