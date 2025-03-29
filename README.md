@@ -1,3 +1,5 @@
+This project is an extension of: https://github.com/EspressoSystems/hackathon-example
+
 🛡️ Rollup Transaction Monitor with NFT Minting
 
 Monitors transactions on a custom Arbitrum Sepolia Nitro rollup (ID: 327327327), filtering for transactions of at least 1 wei sent to a specific recipient. When a matching transaction is detected, the relay mints an NFT on Ethereum Sepolia to the sender.
