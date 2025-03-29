@@ -1,0 +1,25 @@
+{
+  "name": "hackathon-example",
+  "version": "1.0.0",
+  "description": "This is a Go application that monitors an your rollup for specific transactions. The application acts as a security bot that watches for outgoing transactions from your wallet address that exceed a configured value threshold, helping you detect potentially unauthorized transfers or drained funds.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EspressoSystems/hackathon-example.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EspressoSystems/hackathon-example/issues"
+  },
+  "homepage": "https://github.com/EspressoSystems/hackathon-example#readme",
+  "dependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5",
+    "hardhat": "^2.22.19"
+  }
+}

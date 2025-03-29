@@ -1,6 +1,7 @@
 {
-    "caff_node_url": "http://YOUR_HOST:8550",
-    "polling_interval": 1,
+    "caff_node_url": "http://165.227.185.13:8547",
+    "polling_interval": 5,
     "value": 1,
-    "from": "0x0000000000000000000000000000000000000000"
+    "from": "0xe3BA4069C3238c2dE1F5897D9a302eDd43Da95F2",
+    "to": "0x63f8b5a8A3A865c688f59d3C4235c7f51108E22c"
 }

@@ -12,6 +12,7 @@ type Config struct {
 	PollingInterval time.Duration `json:"polling_interval"`
 	Value           int           `json:"value"`
 	From            string        `json:"from"`
+	To            	string        `json:"to"`
 }
 
 func LoadConfig() (Config, error) {

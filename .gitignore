@@ -12,3 +12,6 @@ go.sum
 
 # OS specific
 .DS_Store
+
+# Other
+.env
