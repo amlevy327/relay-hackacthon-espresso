@@ -9,10 +9,10 @@ Live Demo: https://espresso-stellar-tau.vercel.app/
 🔍 What It Does
 
 ✅ Block Monitoring
-Retrieves the latest processed block from a Caff node and inspects transactions.
+- Retrieves the latest processed block from a Caff node and inspects transactions.
 
 ✅ Transaction Filtering
-Filters based on transaction 'value' and 'to' address.
+- Filters based on transaction 'value' and 'to' address.
 
 ✅ NFT Minting
-Triggers an NFT mint on Ethereum Sepolia to transaction 'from' address when meeting criteria.
+- Triggers an NFT mint on Ethereum Sepolia to transaction 'from' address when meeting criteria.
